@@ -1,0 +1,22 @@
+    prompt = ChatPromptTemplate.from_messages([
+        SystemMessagePromptTemplate.from_template(system_message),
+        HumanMessagePromptTemplate.from_template(query)
+    ])
+
+    embedding = CohereEmbeddings(cohere_api_key = COHERE_API_KEY)
+    client = QdrantClient(
+    url="https://3fa6dcd0-abb6-4990-9086-b629688151ad.eu-central-1-0.aws.cloud.qdrant.io", 
+    api_key=QDRANT_API_KEY,
+    )
+
+    vectorstore_mydocs = Qdrant(
+    client=client,
+    collection_name="contracts_chunks",
+    embeddings=embedding
+    )
+    retriever = vectorstore_mydocs.as_retriever()
+    qa_chain = RetrievalQAWithSourcesChain.from_chain_type(
+    llm=llm,
+    chain_type="stuff",
+    retriever=retriever,
+    )
